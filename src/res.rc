@@ -1,0 +1,21 @@
+ICON1                   ICON                    "../data/favicon.ico"
+
+#include "../inc/resource.h"
+
+IDR_MENU1 MENU {
+    POPUP "File" {
+        MENUITEM "New", IDR_NEW
+        MENUITEM "Open...", IDR_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "Save", IDR_SAVE
+        MENUITEM "Save As...", IDR_SAVEAS
+        MENUITEM SEPARATOR
+        MENUITEM "Quit", IDR_QUIT
+    }
+    POPUP "View" {
+        MENUITEM "Set Font...", IDR_SETFONT
+    }
+    POPUP "Help" {
+        MENUITEM "About", IDR_ABOUT
+    }
+}

@@ -1,3 +1,6 @@
+#ifndef RESOURCE_H
+#define RESOURCE_H
+
 #define IDR_MENU1 100
 // file {
 #define IDR_NEW 200
@@ -14,3 +17,4 @@
 // help {
 #define IDR_ABOUT 400
 // }
+#endif

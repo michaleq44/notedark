@@ -1,22 +1,29 @@
-#ifndef UNICODE
-#define UNICODE
-#endif
+#include <main.h>
 
-#include <windows.h>
-#include <stdio.h>
-#include <resource.h>
-
-wchar_t winname[] = L"text editor (no longer asm)";
-wchar_t *content;
-LONG width = 800, height = 600;
+LPWSTR winname;
+LPWSTR content;
+WCHAR filename[32767];
+LONG width, height;
 HBRUSH bgbrush;
 HWND txtbox;
+HANDLE hout;
 HGDIOBJ font;
+BOOL saved;
+LPWSTR txt;
+int lencontent;
 
-LRESULT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-LRESULT WINAPI HandleMenubar(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+int main(int argc, LPWSTR argv[]) {
+    winname = L"text editor (no longer asm)";
+    memset(filename, 0, 32767);
+    saved = FALSE;
+    content = malloc(2);
+    lstrcpyW(content, L"\0");
+    txt = malloc(2);
 
-int main(int argc, wchar_t* argv[]) {
+    hout = GetStdHandle(-11);
+
+    width = 800, height = 600;
+
     return wWinMain(GetModuleHandle(NULL), NULL, GetCommandLine(), SW_SHOWNORMAL);
 }
 
@@ -48,23 +55,25 @@ LRESULT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
         case WM_CREATE:
             printf("%ls\n", winname);
             txtbox = CreateWindowEx(WS_EX_WINDOWEDGE,
-            L"EDIT", L"", WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP | ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | DS_SETFONT | WS_BORDER,
+            L"EDIT", L"", WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP | ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | DS_SETFONT,
                 0, 0, width, height,
                 hwnd, NULL, (HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE), NULL);
 
-            font = CreateFontW(0, 0, 0, 0, FW_LIGHT, FALSE, FALSE, FALSE, EASTEUROPE_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_MODERN, L"Courier New\0\0");
+            font = CreateFontW(0, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, EASTEUROPE_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_MODERN, L"Courier New");
             SendMessage(hwnd, WM_SETFONT, (WPARAM)font, MAKELPARAM(TRUE, 0));
             SendMessage(txtbox, WM_SETFONT, (WPARAM)font, MAKELPARAM(TRUE, 0));
         break;
+        case WM_CLOSE:
+            if (Quit(hwnd, uMsg, wParam, lParam)) DestroyWindow(hwnd);
+        break;
         case WM_DESTROY:
-            DeleteObject(hwnd);
+            CloseHandle(hout);
+            free(content);
             PostQuitMessage(0);
             ExitProcess(0);
         case WM_SIZE:
             width = LOWORD(lParam);
             height = HIWORD(lParam);
-            wprintf(L"%d %d\n", width, height);
-
             SetWindowPos(txtbox, hwnd, 0, 0, width, height, SWP_NOZORDER);
         break;
         case WM_PAINT:
@@ -87,25 +96,5 @@ LRESULT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
         default: return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
 
-    return 0;
-}
-
-LRESULT WINAPI HandleMenubar(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    WORD wmId = LOWORD(wParam);
-    WORD wmEvent = HIWORD(wParam);
-
-    switch (wmId) {
-        case IDR_ABOUT:
-            int len = GetWindowTextLength(txtbox);
-            content = malloc(len+1);
-            GetWindowText(txtbox, content, len+1);
-            wprintf(L"%ls\n", content);
-        break;
-        case IDR_QUIT:
-            DestroyWindow(hwnd);
-        break;
-
-        default: return DefWindowProc(hwnd, uMsg, wParam, lParam);
-    }
     return 0;
 }

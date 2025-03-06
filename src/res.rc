@@ -12,9 +12,9 @@ IDR_MENU1 MENU {
         MENUITEM SEPARATOR
         MENUITEM "Quit", IDR_QUIT
     }
-    POPUP "View" {
+    /*POPUP "View" {
         MENUITEM "Set Font...", IDR_SETFONT
-    }
+    }*/
     POPUP "Help" {
         MENUITEM "About", IDR_ABOUT
     }

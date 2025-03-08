@@ -12,7 +12,7 @@ BOOL saved;
 LPWSTR txt;
 int lencontent;
 
-int main(int argc, LPWSTR argv[]) {
+int main(int argc, char** argv) {
     winname = L"text editor (no longer asm)";
     memset(filename, 0, 32767);
     saved = FALSE;
